@@ -45,7 +45,8 @@ class storeProduct
         $description1 = nl2br(
                 make_links_clickable(
                         html_entity_decode($description, ENT_QUOTES)));
-        $getSize = db()->prepare("SELECT size FROM productSizes WHERE id = ?");
+        $getSize = db_ccfm()->prepare(
+                "SELECT size FROM productSizes WHERE id = ?");
         $getSize->execute(array(
                 $size
         ));
@@ -83,7 +84,7 @@ class storeProduct
 
 function isBoard ($id)
 {
-    $x = db()->prepare("SELECT role FROM board WHERE id = ?");
+    $x = db_ccfm()->prepare("SELECT role FROM board WHERE id = ?");
     $x->execute(array(
             $id
     ));
@@ -97,7 +98,7 @@ function isBoard ($id)
 
 function isVendor ($id)
 {
-    $x = db()->prepare(
+    $x = db_ccfm()->prepare(
             "SELECT COUNT(*) FROM vendors WHERE boardId = ? AND approved = '1'");
     $x->execute(array(
             $id
@@ -112,7 +113,7 @@ function isVendor ($id)
 
 function isCust ($id)
 {
-    $x = db()->prepare("SELECT COUNT(*) FROM customers WHERE boardId = ?");
+    $x = db_ccfm()->prepare("SELECT COUNT(*) FROM customers WHERE boardId = ?");
     $x->execute(array(
             $id
     ));
@@ -126,7 +127,7 @@ function isCust ($id)
 
 function vendorHighlight ()
 {
-    $ven = db()->query(
+    $ven = db_ccfm()->query(
             "SELECT id,displayName,picName FROM vendors ORDER BY rand() LIMIT 1");
     $venRow = $ven->fetch();
     $venId = $venRow['id'];
@@ -145,7 +146,7 @@ function vendorHighlight ()
 
 function upcomingEvents ()
 {
-    $cal = db()->prepare(
+    $cal = db_ccfm()->prepare(
             "SELECT * FROM calendar WHERE eventTime > ? ORDER BY eventTime LIMIT 5");
     $cal->execute(array(
             time()
@@ -163,7 +164,7 @@ function upcomingEvents ()
 
 function inCart ($id)
 {
-    $checkCart = db()->prepare(
+    $checkCart = db_ccfm()->prepare(
             "SELECT COUNT(*) FROM onlineSales WHERE custId = ? && productId = ? && inCart = '1'");
     $checkCart->execute(array(
             $custId,
@@ -190,7 +191,8 @@ function sendPWResetEmail ($toId, $firstName, $email, $verifyTime)
 function emailV ($toId, $emailFrom, $emailSubject, $emailText)
 {
     foreach ($toId as $v) {
-        $getE = db()->prepare("SELECT agreementEmail FROM vendors WHERE id = ?");
+        $getE = db_ccfm()->prepare(
+                "SELECT agreementEmail FROM vendors WHERE id = ?");
         $getE->execute(array(
                 $v
         ));
