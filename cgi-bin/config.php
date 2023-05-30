@@ -3,12 +3,15 @@ session_start();
 
 function db ()
 {
-    $dbhost = 'localhost';
-    $dbname = 'farmersmarket';
-    $dbuser = 'fm_user';
-    $dbpass = 'fmadminmf';
+    $username = "doadmin";
+    $password = "AVNS__ifhVbONAt9Xjb95fkk";
+    $host = "dbaas-db-10581460-do-user-13908232-0.b.db.ondigitalocean.com";
+    $port = "25060";
+    $database = "defaultdb";
+    $sslmode = "REQUIRED";
 
-    $db = new PDO("mysql:host=$dbhost; dbname=$dbname", "$dbuser", "$dbpass");
+    $db = new PDO(
+            "mysql://$username:$password@$host:$port/$database?ssl-mode=$sslmode");
     return $db;
 }
 
