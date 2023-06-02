@@ -351,7 +351,7 @@ if (filter_input(INPUT_POST, 'venAppUp', FILTER_SANITIZE_NUMBER_INT)) {
                 if ($width != null && $height != null) {
                     $imageType = getPicType($_FILES["image"]['type']);
                     $imageName = $time . "." . $imageType;
-                    processPic("$domain/img/vendors/$venId", $imageName,
+                    processPic("img/vendors/$venId", $imageName,
                             $tmpFile, 600, 150);
                     if (file_exists("img/vendors/$venId/$pN")) {
                         unlink("img/vendors/$venId/$pN");

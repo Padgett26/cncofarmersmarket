@@ -935,7 +935,7 @@ if (isBoard($myId)) {
             if ($width != null && $height != null) {
                 $imageType = getPicType($_FILES["image"]['type']);
                 $imageName = $time . "." . $imageType;
-                processPic("$domain/img/calendar", $imageName, $tmpFile, 600,
+                processPic("img/calendar", $imageName, $tmpFile, 600,
                         150);
                 $p1stmt = $db->prepare(
                         "UPDATE calendar SET picName=? WHERE id=?");
@@ -1176,7 +1176,7 @@ if (isBoard($myId)) {
             if ($width1 != null && $height1 != null) {
                 $image1Type = getPicType($_FILES["image1"]['type']);
                 $image1Name = (time() + 1) . "." . $image1Type;
-                processPic("$domain/img/pagePics", $image1Name, $tmpFile, 600,
+                processPic("img/pagePics", $image1Name, $tmpFile, 600,
                         150);
                 $p1stmt = $db->prepare("UPDATE news SET pic1Name=? WHERE id=?");
                 $p1stmt->execute(array(
@@ -1193,7 +1193,7 @@ if (isBoard($myId)) {
             if ($width2 != null && $height2 != null) {
                 $image2Type = getPicType($_FILES["image2"]['type']);
                 $image2Name = (time() + 2) . "." . $image2Type;
-                processPic("$domain/img/pagePics", $image2Name, $tmpFile, 600,
+                processPic("img/pagePics", $image2Name, $tmpFile, 600,
                         150);
                 $p1stmt = $db->prepare("UPDATE news SET pic2Name=? WHERE id=?");
                 $p1stmt->execute(array(
@@ -1281,7 +1281,7 @@ if (isBoard($myId)) {
                 if ($width1 != null && $height1 != null) {
                     $image1Type = getPicType($_FILES["image1"]['type']);
                     $image1Name = $time . "." . $image1Type;
-                    processPic("$domain/img/pagePics", $image1Name, $tmpFile,
+                    processPic("img/pagePics", $image1Name, $tmpFile,
                             600, 150);
                     $p1stmt = $db->prepare(
                             "UPDATE media SET picName=? WHERE id=?");
