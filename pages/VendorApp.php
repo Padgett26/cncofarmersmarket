@@ -345,15 +345,14 @@ if (filter_input(INPUT_POST, 'venAppUp', FILTER_SANITIZE_NUMBER_INT)) {
 
             if (isset($_FILES["image"]["tmp_name"]) &&
                     ($_FILES['image']['size'] > 1000)) {
-                $image = $_FILES["image"]["tmp_name"];
-                $folder = "img/vendors/$venId";
-                list ($width, $height) = (getimagesize($image) != null) ? getimagesize(
-                        $image) : null;
+                $tmpFile = $_FILES["image"]["tmp_name"];
+                list ($width, $height) = (getimagesize($tmpFile) != null) ? getimagesize(
+                        $tmpFile) : null;
                 if ($width != null && $height != null) {
                     $imageType = getPicType($_FILES["image"]['type']);
                     $imageName = $time . "." . $imageType;
-                    processPic($imageName, $image, $folder);
-                    processThumbPic($imageName, $image, $folder);
+                    processPic("$domain/img/vendors/$venId", $imageName,
+                            $tmpFile, 600, 150);
                     if (file_exists("img/vendors/$venId/$pN")) {
                         unlink("img/vendors/$venId/$pN");
                     }

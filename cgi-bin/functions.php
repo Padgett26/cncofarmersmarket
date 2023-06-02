@@ -221,66 +221,6 @@ function emailV ($toId, $emailFrom, $emailSubject, $emailText)
     }
 }
 
-function getPicType ($imageType)
-{
-    switch ($imageType) {
-        case "image/gif":
-            $picExt = "gif";
-            break;
-        case "image/jpeg":
-            $picExt = "jpg";
-            break;
-        case "image/pjpeg":
-            $picExt = "jpg";
-            break;
-        case "image/png":
-            $picExt = "png";
-            break;
-        default:
-            $picExt = "xxx";
-            break;
-    }
-    return $picExt;
-}
-
-function processPic ($imageName, $tmpFile, $folder)
-{
-    if (! is_dir("$folder")) {
-        mkdir("$folder", 0777, true);
-    }
-
-    $saveto = "$folder/$imageName";
-
-    list ($width, $height) = (getimagesize($tmpFile) != null) ? getimagesize(
-            $tmpFile) : null;
-    if ($width != null && $height != null) {
-        $image = new Imagick($tmpFile);
-        $image->thumbnailImage(600, 600, true);
-        $image->writeImage($saveto);
-    }
-}
-
-function processThumbPic ($imageName, $tmpFile, $f)
-{
-    $folder = "$f/thumb";
-
-    if (! is_dir("$f")) {
-        mkdir("$f", 0777, true);
-    }
-    if (! is_dir("$folder")) {
-        mkdir("$folder", 0777, true);
-    }
-
-    $saveto = "$folder/$imageName";
-    list ($width, $height) = (getimagesize($tmpFile) != null) ? getimagesize(
-            $tmpFile) : null;
-    if ($width != null && $height != null) {
-        $image = new Imagick($tmpFile);
-        $image->thumbnailImage(150, 150, true);
-        $image->writeImage($saveto);
-    }
-}
-
 function processPdf ($pdfName, $file)
 {
     $saveto = "pdf/$pdfName.pdf";
@@ -292,14 +232,6 @@ function deletePdf ($pdfName)
     if (file_exists("pdf/" . $pdfName . ".pdf")) {
         unlink("pdf/" . $pdfName . ".pdf");
     }
-}
-
-function make_links_clickable ($text)
-{
-    return preg_replace(
-            '!(((f|ht)tp(s)?://)[-a-zA-Zа-яА-Я()0-9@:%_+.~#?&;//=]+)!i',
-            "<a href='$1' target='_blank' style='color:#cc4541; text-decoration:underline;'>$1</a>",
-            $text);
 }
 
 function qtyAvailable ($productId, $db)
@@ -383,23 +315,4 @@ function vSalesEmail ($vId, $db)
         mail($email, "Cheyenne Co Farmer's Market online sales", $message,
                 $headers);
     }
-}
-
-function delTree ($dir)
-{
-    $files = array_diff(scandir($dir), array(
-            '.',
-            '..'
-    ));
-    foreach ($files as $file) {
-        (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file");
-    }
-    return rmdir($dir);
-}
-
-function money ($amt)
-{
-    settype($amt, "float");
-    $fmt = new NumberFormatter('en_US', NumberFormatter::CURRENCY);
-    return $fmt->formatCurrency($amt, "USD");
 }

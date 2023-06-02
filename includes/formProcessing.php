@@ -929,15 +929,14 @@ if (isBoard($myId)) {
         }
 
         if ($calPic == 'new') {
-            $image = $_FILES["image"]["tmp_name"];
-            $folder = "img/calendar";
-            list ($width, $height) = (getimagesize($image) != null) ? getimagesize(
-                    $image) : null;
+            $tmpFile = $_FILES["image"]["tmp_name"];
+            list ($width, $height) = (getimagesize($tmpFile) != null) ? getimagesize(
+                    $tmpFile) : null;
             if ($width != null && $height != null) {
                 $imageType = getPicType($_FILES["image"]['type']);
                 $imageName = $time . "." . $imageType;
-                processPic($imageName, $image, $folder);
-                processThumbPic($imageName, $image, $folder);
+                processPic("$domain/img/calendar", $imageName, $tmpFile, 600,
+                        150);
                 $p1stmt = $db->prepare(
                         "UPDATE calendar SET picName=? WHERE id=?");
                 $p1stmt->execute(array(
@@ -1170,15 +1169,15 @@ if (isBoard($myId)) {
             }
         }
         if (isset($_FILES['image1']['tmp_name'])) {
-            $image1 = $_FILES["image1"]["tmp_name"];
+            $tmpFile = $_FILES["image1"]["tmp_name"];
             $folder = "img/pagePics";
-            list ($width1, $height1) = (getimagesize($image1) != null) ? getimagesize(
-                    $image1) : null;
+            list ($width1, $height1) = (getimagesize($tmpFile) != null) ? getimagesize(
+                    $tmpFile) : null;
             if ($width1 != null && $height1 != null) {
                 $image1Type = getPicType($_FILES["image1"]['type']);
                 $image1Name = (time() + 1) . "." . $image1Type;
-                processPic($image1Name, $image1, $folder);
-                processThumbPic($image1Name, $image1, $folder);
+                processPic("$domain/img/pagePics", $image1Name, $tmpFile, 600,
+                        150);
                 $p1stmt = $db->prepare("UPDATE news SET pic1Name=? WHERE id=?");
                 $p1stmt->execute(array(
                         $image1Name,
@@ -1188,15 +1187,14 @@ if (isBoard($myId)) {
         }
 
         if (isset($_FILES['image2']['tmp_name'])) {
-            $image2 = $_FILES["image2"]["tmp_name"];
-            $folder = "img/pagePics";
-            list ($width2, $height2) = (getimagesize($image2) != null) ? getimagesize(
-                    $image2) : null;
+            $tmpFile = $_FILES["image2"]["tmp_name"];
+            list ($width2, $height2) = (getimagesize($tmpFile) != null) ? getimagesize(
+                    $tmpFile) : null;
             if ($width2 != null && $height2 != null) {
                 $image2Type = getPicType($_FILES["image2"]['type']);
                 $image2Name = (time() + 2) . "." . $image2Type;
-                processPic($image2Name, $image2, $folder);
-                processThumbPic($image2Name, $image2, $folder);
+                processPic("$domain/img/pagePics", $image2Name, $tmpFile, 600,
+                        150);
                 $p1stmt = $db->prepare("UPDATE news SET pic2Name=? WHERE id=?");
                 $p1stmt->execute(array(
                         $image2Name,
@@ -1277,15 +1275,14 @@ if (isBoard($myId)) {
             $eId = $p5Row['id'];
 
             if (isset($_FILES['image1']['tmp_name'])) {
-                $image1 = $_FILES["image1"]["tmp_name"];
-                $folder = "img/pagePics";
-                list ($width1, $height1) = (getimagesize($image1) != null) ? getimagesize(
-                        $image1) : null;
+                $tmpFile = $_FILES["image1"]["tmp_name"];
+                list ($width1, $height1) = (getimagesize($tmpFile) != null) ? getimagesize(
+                        $tmpFile) : null;
                 if ($width1 != null && $height1 != null) {
                     $image1Type = getPicType($_FILES["image1"]['type']);
                     $image1Name = $time . "." . $image1Type;
-                    processPic($image1Name, $image1, $folder);
-                    processThumbPic($image1Name, $image1, $folder);
+                    processPic("$domain/img/pagePics", $image1Name, $tmpFile,
+                            600, 150);
                     $p1stmt = $db->prepare(
                             "UPDATE media SET picName=? WHERE id=?");
                     $p1stmt->execute(array(
