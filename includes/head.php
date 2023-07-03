@@ -19,34 +19,9 @@
 <meta name="viewport"               content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1" />
 <meta name="keywords"               content="cheyenne county kansas, farmers market, local food, local arts, local crafts, st francis kansas" />
 <meta name="description"            content="To help strengthen our local food system, through educating and empowering community support of a marketplace that supports healthy, local, and sustainable food and homemade items to contribute to our local economy." />
-<?php
-if ($page == "News") {
-    ?>
-    <meta property="fb:app_id"          content="659827678160110" />
-    <meta property="og:site_name"       content="<?php
-    echo $siteTitle;
-    ?>" />
-    <meta property="og:type"            content="article" />
-    <meta property="og:url"         content="https://cncofarmersmarket.com/index.php?page=News&articleId=<?php
-
-    echo $artId;
-    ?>">
-    <meta property="og:title"       content="<?php
-    echo $artTitle;
-    ?>">
-    <meta property="og:description" content="<?php
-    echo $artContent;
-    ?>">
-    <?php
-    list ($widthm, $heightm) = (getimagesize("img/pagePics/$artPic") != null) ? getimagesize(
-            "img/pagePics/$artPic") : null;
-    echo "<meta property='og:image'       content='https://cncofarmersmarket.com/img/pagePics/$artPic'>\n";
-    echo "<meta property='og:image:width'       content='$widthm'>\n";
-    echo "<meta property='og:image:height'       content='$heightm'>\n";
-}
-?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <link rel="stylesheet" href="includes/lightbox2/css/lightbox.min.css">
+
 <style>
     * {
         box-sizing: border-box;
@@ -230,6 +205,17 @@ if ($page == "News") {
         }
     }
 
+    function toggleclass(itm) {
+        const myCollection = document.getElementsByClassName(itm);
+    	for (let i = 0; i < myCollection.length; i++) {
+      		if (myCollection[i].style.display === "none") {
+                myCollection[i].style.display = "block";
+            } else {
+                myCollection[i].style.display = "none";
+            }
+    	}
+	}
+
     var height = window.innerHeight
             || document.documentElement.clientHeight
             || document.body.clientHeight;
@@ -266,6 +252,7 @@ if ($page == "News") {
     function updateMS() {
         var vS = Number(document.getElementById("MStotalSAICN").value);
         var vC = Number(document.getElementById("MStotalCNSAI").value);
+        var baseSales = vS + vC;
         var saicn = vS * <?php
         echo $SAICNtax;
         ?>;
@@ -275,34 +262,39 @@ echo $CNSAItax;
 		var tot = saicn + cnsai;
 		var msdue = document.getElementById("MSdue");
 		var msfeedue = document.getElementById("MSfeedue");
-<?php
-if ($FMFee >= .001) {
-    ?>
-	var feeDue = (vS + vC) * <?php
-    echo $FMFee;
-    ?>;
-	var totalDue = tot + feeDue;
-            msdue.innerHTML = totalDue.toFixed(2);
-            msfeedue.innerHTML = feeDue.toFixed(2);
-    <?php
-} elseif ($boothFee >= .01) {
-    ?>
-	var totalDue = tot + <?php
-    echo $boothFee;
-    ?>;
-            msdue.innerHTML = totalDue.toFixed(2);
-            msfeedue.innerHTML = <?php
+		if (baseSales > 10) {
+            <?php
+            if ($FMFee >= .001) {
+                ?>
+            	var feeDue = (vS + vC) * <?php
+                echo $FMFee;
+                ?>;
+            	var totalDue = tot + feeDue;
+                        msdue.innerHTML = totalDue.toFixed(2);
+                        msfeedue.innerHTML = feeDue.toFixed(2);
+                <?php
+            } elseif ($boothFee >= .01) {
+                ?>
+            	var totalDue = tot + <?php
+                echo $boothFee;
+                ?>;
+                        msdue.innerHTML = totalDue.toFixed(2);
+                        msfeedue.innerHTML = <?php
 
-    echo $boothFee;
-    ?>.toFixed(2);
-    <?php
-} else {
-    ?>
-            msdue.innerHTML = tot.toFixed(2);
+                echo $boothFee;
+                ?>.toFixed(2);
+                <?php
+            } else {
+                ?>
+                        msdue.innerHTML = tot.toFixed(2);
+                        msfeedue.innerHTML = 0.00;
+                <?php
+            }
+            ?>
+        } else {
+        	msdue.innerHTML = 0.00;
             msfeedue.innerHTML = 0.00;
-    <?php
-}
-?>
+        }
     }
 
     function moneyrcvd() {

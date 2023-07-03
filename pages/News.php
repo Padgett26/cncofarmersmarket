@@ -75,15 +75,6 @@ while ($row10 = $stmt10->fetch()) {
     } else {
         if ($highlight == $id) {
             echo "<div class='clearfix'>";
-            ?>
-            <div class="fb-share-button" data-href="https://cncofarmersmarket.com/index.php?page=News&amp;articleId=<?php
-
-            echo $id;
-            ?>" data-layout="button" data-size="small"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fcncofarmersmarket.com%2Findex.php%3Fpage%3DNews%26articleId%3D<?php
-
-            echo $id;
-            ?>&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Share on FB</a></div>
-            <?php
             echo "<div style='text-align:center; font-weight:bold; font-size:1.5em; padding:40px; font-family:sans-serif; text-decoration:underline;'>$title</div>\n";
             echo (file_exists("img/pagePics/$pic1") && $pic1 != "noPic.png") ? "<img src='img/pagePics/$pic1' alt='' style='float:right; margin:10px; max-width:400px; max-height:400px;' />" : "";
             echo "<div style='text-align:justify; font-family:sans-serif; padding:10px;'>$content</div>";

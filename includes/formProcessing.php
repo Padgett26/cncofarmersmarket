@@ -754,52 +754,56 @@ if (isBoard($myId)) {
         $feeOnly = (filter_input(INPUT_POST, 'feeOnly',
                 FILTER_SANITIZE_NUMBER_INT) == 1) ? 1 : 0;
 
-        $SAICNamount = ($SAICNsales * $SAICNtax);
-        $CNSAIamount = ($CNSAIsales * $CNSAItax);
-        if ($FMFee >= .001) {
-            $FMamount = (($SAICNamount + $CNSAIamount) * $FMFee);
-        } else {
-            $FMamount = $boothFee;
-        }
-
-        if ($feeOnly == 0) {
-            if ($SAICNamount >= 0.01) {
-                $getT1 = $db->prepare(
-                        "INSERT INTO transactions VALUES(NULL,'0','0','2',?,?,'0',?,?,?,?)");
-                $getT1->execute(
-                        array(
-                                $sales,
-                                $SAICNamount,
-                                $date,
-                                $checkNum,
-                                $vendor,
-                                "saicn"
-                        ));
+        $baseSales = $SAICNsales + $CNSAIsales;
+        if ($baseSales > 10.00) {
+            $SAICNamount = ($SAICNsales * $SAICNtax);
+            $CNSAIamount = ($CNSAIsales * $CNSAItax);
+            if ($FMFee >= .001) {
+                $FMamount = ($baseSales * $FMFee);
+            } else {
+                $FMamount = $boothFee;
             }
-            if ($CNSAIamount >= 0.01) {
-                $getT1 = $db->prepare(
-                        "INSERT INTO transactions VALUES(NULL,'0','0','2',?,?,'0',?,?,?,?)");
-                $getT1->execute(
-                        array(
-                                $sales,
-                                $CNSAIamount,
-                                $date,
-                                $checkNum,
-                                $vendor,
-                                "cnsai"
-                        ));
-            }
-        }
 
-        $getT2 = $db->prepare(
-                "INSERT INTO transactions VALUES(NULL,'0','0','3',?,?,'0',?,?,?,'0')");
-        $getT2->execute(array(
-                $sales,
-                $FMamount,
-                $date,
-                $checkNum,
-                $vendor
-        ));
+            if ($feeOnly == 0) {
+                if ($SAICNamount >= 0.01) {
+                    $getT1 = $db->prepare(
+                            "INSERT INTO transactions VALUES(NULL,'0','0','2',?,?,'0',?,?,?,?)");
+                    $getT1->execute(
+                            array(
+                                    $SAICNsales,
+                                    $SAICNamount,
+                                    $date,
+                                    $checkNum,
+                                    $vendor,
+                                    "saicn"
+                            ));
+                }
+                if ($CNSAIamount >= 0.01) {
+                    $getT1 = $db->prepare(
+                            "INSERT INTO transactions VALUES(NULL,'0','0','2',?,?,'0',?,?,?,?)");
+                    $getT1->execute(
+                            array(
+                                    $CNSAIsales,
+                                    $CNSAIamount,
+                                    $date,
+                                    $checkNum,
+                                    $vendor,
+                                    "cnsai"
+                            ));
+                }
+            }
+
+            $getT2 = $db->prepare(
+                    "INSERT INTO transactions VALUES(NULL,'0','0','3',?,?,'0',?,?,?,'0')");
+            $getT2->execute(
+                    array(
+                            $SAICNsales + $CNSAIsales,
+                            $FMamount,
+                            $date,
+                            $checkNum,
+                            $vendor
+                    ));
+        }
         $mseOpen = 1;
     }
 
@@ -935,8 +939,7 @@ if (isBoard($myId)) {
             if ($width != null && $height != null) {
                 $imageType = getPicType($_FILES["image"]['type']);
                 $imageName = $time . "." . $imageType;
-                processPic("img/calendar", $imageName, $tmpFile, 600,
-                        150);
+                processPic("img/calendar", $imageName, $tmpFile, 600, 150);
                 $p1stmt = $db->prepare(
                         "UPDATE calendar SET picName=? WHERE id=?");
                 $p1stmt->execute(array(
@@ -1176,8 +1179,7 @@ if (isBoard($myId)) {
             if ($width1 != null && $height1 != null) {
                 $image1Type = getPicType($_FILES["image1"]['type']);
                 $image1Name = (time() + 1) . "." . $image1Type;
-                processPic("img/pagePics", $image1Name, $tmpFile, 600,
-                        150);
+                processPic("img/pagePics", $image1Name, $tmpFile, 600, 150);
                 $p1stmt = $db->prepare("UPDATE news SET pic1Name=? WHERE id=?");
                 $p1stmt->execute(array(
                         $image1Name,
@@ -1193,8 +1195,7 @@ if (isBoard($myId)) {
             if ($width2 != null && $height2 != null) {
                 $image2Type = getPicType($_FILES["image2"]['type']);
                 $image2Name = (time() + 2) . "." . $image2Type;
-                processPic("img/pagePics", $image2Name, $tmpFile, 600,
-                        150);
+                processPic("img/pagePics", $image2Name, $tmpFile, 600, 150);
                 $p1stmt = $db->prepare("UPDATE news SET pic2Name=? WHERE id=?");
                 $p1stmt->execute(array(
                         $image2Name,
@@ -1281,8 +1282,7 @@ if (isBoard($myId)) {
                 if ($width1 != null && $height1 != null) {
                     $image1Type = getPicType($_FILES["image1"]['type']);
                     $image1Name = $time . "." . $image1Type;
-                    processPic("img/pagePics", $image1Name, $tmpFile,
-                            600, 150);
+                    processPic("img/pagePics", $image1Name, $tmpFile, 600, 150);
                     $p1stmt = $db->prepare(
                             "UPDATE media SET picName=? WHERE id=?");
                     $p1stmt->execute(array(

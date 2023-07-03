@@ -194,14 +194,14 @@ if (isBoard($myId)) {
 	<tr>
 		<td>Sales - Non-food items / prepared foods:</td>
 		<td>$<input type="number" min="0.00" step=".01" name="SAICNsales"
-			value="" id="MStotalSAICN" oninput="updateMS()">
+			value="0.00" id="MStotalSAICN" oninput="updateMS()">
 		</td>
 		<td></td>
 	</tr>
 	<tr>
 		<td>Sales - Fresh foods / baked items / ingred:</td>
 		<td>$<input type="number" min="0.00" step=".01" name="CNSAIsales"
-			value="" id="MStotalCNSAI" oninput="updateMS()">
+			value="0.00" id="MStotalCNSAI" oninput="updateMS()">
 		</td>
 		<td></td>
 	</tr>
@@ -337,198 +337,7 @@ if (isBoard($myId)) {
 	onclick="toggleview('sales')">Sales Numbers</div>
 <div id="sales" style="display: none;">
 	<?php
-    $getBegin = $db->prepare(
-            "SELECT paidDate FROM transactions ORDER BY paidDate LIMIT 1");
-    $getBegin->execute();
-    $getBR = $getBegin->fetch();
-    $beginY = ($getBR) ? date("Y", $getBR['paidDate']) : date("Y", $time);
-    $endY = date("Y", $time);
-
-    for ($beginY; $beginY <= $endY; ++ $beginY) {
-        $yearXactions = array();
-        $monthXactions = array();
-        $weekXactions = array();
-        $startJan = mktime(0, 0, 0, 1, 1, $beginY);
-        $endDec = mktime(23, 59, 59, 12, 31, $beginY);
-
-        // Get weekly xactions
-        for ($i = $startJan, $j = 1; $i <= $endDec; $i = $i + 604800) {
-            $getT = $db->prepare(
-                    "SELECT xType, baseSales, amount, ref FROM transactions WHERE paidDate > ? && paidDate < ?");
-            $getT->execute(array(
-                    $i,
-                    $i + 604800
-            ));
-            while ($getTR = $getT->fetch()) {
-                $x = $getTR['xType'];
-                $ref = $getTR['ref'];
-
-                switch ($x) {
-                    case '2':
-                        if ($ref == 'cnsai')
-                            $weekXactions[$j]['cnsai'] += $getTR['baseSales'];
-                        else
-                            $weekXactions[$j]['saicn'] += $getTR['baseSales'];
-                        $weekXactions[$j]['tax'] += $getTR['amount'];
-                        break;
-                    case '3':
-                        $weekXactions[$j]['sales'] += $getTR['baseSales'];
-                        $weekXactions[$j]['fee'] += $getTR['amount'];
-                        break;
-                    case '4':
-                        $weekXactions[$j]['donation'] += $getTR['amount'];
-                        break;
-                }
-            }
-            $j ++;
-        }
-
-        // Get monthly xactions
-        for ($k = 1; $k <= 12; $k ++) {
-            $start = mktime(0, 0, 0, $k, 1, $beginY);
-            $end = mktime(23, 59, 59, $k + 1, - 1, $beginY);
-            $getV1 = $db->prepare(
-                    "SELECT xType, baseSales, amount, paid, ref FROM transactions WHERE paidDate >= ? && paidDate <= ?");
-            $getV1->execute(array(
-                    $start,
-                    $end
-            ));
-            while ($getV1R = $getV1->fetch()) {
-                $t = $getV1R['xType'];
-                switch ($t) {
-                    case '2':
-                        $monthXactions[$k]['paid'] += $getV1R['paid'];
-                        if ($getV1R['ref'] == 'cnsai') {
-                            $monthXactions[$k]['cnsai'] += $getV1R['baseSales'];
-                        } else {
-                            $monthXactions[$k]['saicn'] += $getV1R['baseSales'];
-                        }
-                        $monthXactions[$k]['tax'] += $getV1R['amount'];
-                        break;
-                    case '3':
-                        $monthXactions[$k]['sales'] += $getV1R['baseSales'];
-                        $monthXactions[$k]['fee'] += $getV1R['amount'];
-                        break;
-                    case '4':
-                        $monthXactions[$k]['donation'] += $getV1R['amount'];
-                        break;
-                }
-            }
-        }
-        echo "<div style='font-weight:bold; font-size:1.25em; text-align:left; cursor:pointer;' onclick='toggleview(\"year$beginY\")'>$beginY</div>\n";
-        echo "<table id='year$beginY' style='display:";
-        echo ($beginY == date("Y", $time)) ? "block" : "none";
-        echo "; border:1px solid black;' cellpadding='5px' cellspacing='0px'>";
-        ?>
-        <tr>
-    		<td style='font-weight: bold; text-align: center;'>Year</td>
-    		<td style='font-weight: bold; text-align: center;'>Month<br>/<br>week</td>
-    		<td style='font-weight: bold; text-align: center;'>Total Sales</td>
-    		<td style='font-weight: bold; text-align: center;'>SAICN<br>Taxed<br>Sales</td>
-    		<td style='font-weight: bold; text-align: center;'>CNSAI<br>Taxed<br>Sales</td>
-    		<td style='font-weight: bold; text-align: center;'>Taxes<br>Collected</td>
-    		<td style='font-weight: bold; text-align: center;'>Pay Taxes</td>
-    		<td style='font-weight: bold; text-align: center;'>FM fee<br>Collected</td>
-    		<td style='font-weight: bold; text-align: center;'>Donations</td>
-    	</tr>
-    	<tr>
-    		<td colspan='8' style='font-weight: bold; text-align: left; color: #cc4541;'>Yearly Numbers</td>
-    	</tr>
-        <?php
-        for ($l = 1; $l <= 12; $l ++) {
-            $yearXactions['paid'] += $monthXactions[$l]['paid'];
-            $yearXactions['cnsai'] += $monthXactions[$l]['cnsai'];
-            $yearXactions['saicn'] += $monthXactions[$l]['saicn'];
-            $yearXactions['sales'] += $monthXactions[$l]['sales'];
-            $yearXactions['tax'] += $monthXactions[$l]['tax'];
-            $yearXactions['fee'] += $monthXactions[$l]['fee'];
-            $yearXactions['donation'] += $monthXactions[$l]['donation'];
-        }
-        if ($yearXactions['sales'] > 0) {
-            echo "<tr>\n";
-            echo "<td style='border:1px solid black; text-align:center;'>$beginY</td>\n";
-            echo "<td style='border:1px solid black; text-align:center;'></td>\n";
-            echo "<td style='border:1px solid black; text-align:center;'>" .
-                    money($yearXactions['sales']) . "</td>\n";
-            echo "<td style='border:1px solid black; text-align:center;'>" .
-                    money($yearXactions['saicn']) . "</td>\n";
-            echo "<td style='border:1px solid black; text-align:center;'>" .
-                    money($yearXactions['cnsai']) . "</td>\n";
-            echo "<td style='border:1px solid black; text-align:center;'>" .
-                    money($yearXactions['tax']) . "</td>\n";
-            echo "<td style='border:1px solid black; text-align:center;'></td>\n";
-            echo "<td style='border:1px solid black; text-align:center;'>" .
-                    money($yearXactions['fee']) . "</td>\n";
-            echo "<td style='border:1px solid black; text-align:center;'>" .
-                    money($yearXactions['donation']) . "</td>\n";
-            echo "</tr>\n";
-        }
-        ?>
-        <tr>
-    		<td colspan='8' style='font-weight: bold; text-align: left; color: #cc4541;'>Monthly Numbers</td>
-    	</tr>
-        <?php
-        for ($l = 1; $l <= 12; $l ++) {
-            $start = mktime(0, 0, 0, $l, 1, $beginY);
-            $end = mktime(23, 59, 59, $l + 1, - 1, $beginY);
-            if ($monthXactions[$l]['sales'] > 0) {
-                echo "<tr>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>$beginY</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>$months[$l]</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>" .
-                        money($monthXactions[$l]['sales']) . "</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>" .
-                        money($monthXactions[$l]['saicn']) . "</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>" .
-                        money($monthXactions[$l]['cnsai']) . "</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>" .
-                        money($monthXactions[$l]['tax']) . "</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>";
-                if ($monthXactions[$l]['paid'] == $monthXactions[$l]['tax']) {
-                    echo "Paid " . money($monthXactions[$l]['tax']);
-                } else {
-                    echo "Pay " . money($monthXactions[$l]['tax']) .
-                            " <form action='index.php?page=Board' method='post'><input type='checkbox' name='paid' value='1'>";
-                    echo " CK# <input type='text' name='ckNumber' value='' size='5'> <input type='hidden' name='payTaxes' value='1'><input type='hidden' name='start' value='$start'><input type='hidden' name='end' value='$end'><input type='submit' value=' Pay '></form>";
-                }
-                echo "</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>" .
-                        money($monthXactions[$l]['fee']) . "</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>" .
-                        money($monthXactions[$l]['donation']) . "</td>\n";
-                echo "</tr>\n";
-            }
-        }
-        ?>
-        <tr>
-    		<td colspan='8' style='font-weight: bold; text-align: left; color: #cc4541;'>Weekly Numbers</td>
-    	</tr>
-        <?php
-        for ($m = 1; $m <= 53; $m ++) {
-            if ($weekXactions[$m]['sales'] > 0) {
-                echo "<tr>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>$beginY</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>$m</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>" .
-                        money($weekXactions[$m]['sales']) . "</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>" .
-                        money($weekXactions[$m]['saicn']) . "</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>" .
-                        money($weekXactions[$m]['cnsai']) . "</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>" .
-                        money($weekXactions[$m]['tax']) . "</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'></td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>" .
-                        money($weekXactions[$m]['fee']) . "</td>\n";
-                echo "<td style='border:1px solid black; text-align:center;'>" .
-                        money($weekXactions[$m]['donation']) . "</td>\n";
-                echo "</tr>\n";
-            }
-        }
-        ?>
-</table>
-<?php
-    }
+    include "includes/sales.php";
     ?>
 </div>
 <?php
